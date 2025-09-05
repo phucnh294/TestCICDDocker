@@ -16,6 +16,7 @@ jobs:
         uses: NuGet/setup-nuget@v1.0.5
 
       - name: Restore Packages
+        shell: cmd
         run: nuget restore TestCICDDocker.sln
 
       - name: Build Solution
