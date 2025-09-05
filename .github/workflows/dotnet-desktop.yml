@@ -17,7 +17,7 @@ jobs:
         shell: cmd
         run: msbuild.exe TestCICDDocker.sln /p:Configuration=Release
       
-      - name: Copy Build Artifacts
+      - name: Copy Build Artifacts test
         shell: cmd
         run: xcopy /s /e /y ".\TestCICDDocker\obj\Release\Package\PackageTmp" ".\TestCICDDocker\"
       
