@@ -23,6 +23,7 @@ jobs:
         shell: cmd
         run: |
           msbuild.exe TestCICDDocker.sln /p:platform="Any CPU" /p:configuration="Release" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true 
+    
       - name : Prepare Docker Context
         shell: cmd
         run: |
