@@ -1,50 +1,67 @@
-name: Build and Deploy Docker 
+name: Build and Deploy Docker
+
 on:
-  push: 
+  push:
     branches: [ "main" ]
   workflow_dispatch:
+
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  
-    steps:      
-      - uses: actions/checkout@v2
-      
+    runs-on: self-hosted
+
+    steps:
+      # 1. Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Setup MSBuild for .NET Framework
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
+      # 3. Setup NuGet
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.5
 
-      - name: Restore Packages
+      # 4. Restore NuGet packages
+      - name: Restore NuGet packages
         shell: cmd
         run: nuget restore TestCICDDocker.sln
 
-      - name: Build Solution
+      # 5. Build solution and publish output
+      - name: Build Solution and Publish
         shell: cmd
         run: |
-          msbuild.exe TestCICDDocker.sln /p:platform="Any CPU" /p:configuration="Release" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true 
-    
-      - name : Prepare Docker Context
+          msbuild.exe TestCICDDocker.sln /p:platform="Any CPU" /p:configuration="Release" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true
+
+      # 6. Verify the PackageTmp folder exists
+      - name: List PackageTmp folder
+        shell: cmd
+        run: dir .\TestCICDDocker\TestCICDDocker\obj\Release\Package\PackageTmp /s
+
+      # 7. Prepare Docker build context
+      - name: Prepare Docker Context
         shell: cmd
         run: |
-          mkdir TestPublish
-          xcopy /s /e /y ".\TestCICDDocker\obj\Release\Package\PackageTmp\*" ".\TestPublish"
-        
-      - name: Log in to GHCR 
+          if not exist TestPublish mkdir TestPublish
+          xcopy /s /e /y ".\TestCICDDocker\TestCICDDocker\obj\Release\Package\PackageTmp\*" ".\TestPublish"
+          dir .\TestPublish /s
+
+      # 8. Log in to GitHub Container Registry
+      - name: Log in to GHCR
         shell: cmd
         run: echo %GHCR_TOKEN% | docker login ghcr.io -u %GITHUB_ACTOR% --password-stdin
         env:
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
-      
+
+      # 9. Build Docker image
       - name: Build Docker Image
         shell: cmd
-        run: docker build -t testcicddocker:latest -f .\TestCICDDocker\TestCICDDocker\TestCICDDocker\Dockerfile .\TestCICDDocker\TestPublish
-      
-      - name: Tag & Push to GHCR
+        run: docker build -t testcicddocker:latest -f .\TestCICDDocker\TestCICDDocker\TestCICDDocker\Dockerfile .\TestPublish
+
+      # 10. Tag and push Docker image to GHCR
+      - name: Tag & Push Docker Image
         shell: cmd
         run: |
-          docker tag servicefactory:latest ghcr.io/phucnh294/testcicddocker:latest
-          docker push ghcr.io/phucnh294/TestCICDDocker:latest
-      
-      
+          docker tag testcicddocker:latest ghcr.io/${{ github.actor }}/testcicddocker:latest
+          docker push ghcr.io/${{ github.actor }}/testcicddocker:latest
