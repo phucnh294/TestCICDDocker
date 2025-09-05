@@ -14,9 +14,11 @@ jobs:
         uses: microsoft/setup-msbuild@v1
       
       - name: Build Solution
+        shell: cmd
         run: msbuild.exe TestCICDDocker.sln /p:Configuration=Release
       
       - name: Copy Build Artifacts
+        shell: cmd
         run: xcopy /s /e /y ".\TestCICDDocker\obj\Release\Package\PackageTmp" ".\TestCICDDocker\"
       
       - name: Log in to GHCR
