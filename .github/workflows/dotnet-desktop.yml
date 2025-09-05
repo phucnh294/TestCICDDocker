@@ -25,12 +25,15 @@ jobs:
           msbuild.exe TestCICDDocker.sln /p:platform="Any CPU" /p:configuration="Release" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true 
       
       - name: Log in to GHCR
+        shell: pwsh
         run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
       
       - name: Build Docker Image
+        shell: pwsh
         run: docker build -t testcicddocker:latest .
       
       - name: Tag & Push to GHCR
+        shell: pwsh
         run: |
           docker tag servicefactory:latest ghcr.io/phucnh294/testcicddocker:latest
           docker push ghcr.io/phucnh294/TestCICDDocker:latest
