@@ -33,11 +33,7 @@ jobs:
         run: |
           msbuild.exe TestCICDDocker.sln /p:platform="Any CPU" /p:configuration="Release" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true
 
-      # 6. Verify the PackageTmp folder exists
-      - name: List PackageTmp folder
-        shell: cmd
-        run: dir .\TestCICDDocker\TestCICDDocker\obj\Release\Package\PackageTmp /s
-
+    
       # 7. Prepare Docker build context
       - name: Prepare Docker Context
         shell: cmd
