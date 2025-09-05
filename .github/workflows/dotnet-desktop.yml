@@ -30,7 +30,7 @@ jobs:
           mkdir TestPublish
           xcopy /s /e /y ".\TestCICDDocker\obj\Release\Package\PackageTmp\*" ".\TestPublish"
         
-      - name: Log in to GHCR
+      - name: Log in to GHCR 
         shell: cmd
         run: echo %GHCR_TOKEN% | docker login ghcr.io -u %GITHUB_ACTOR% --password-stdin
         env:
