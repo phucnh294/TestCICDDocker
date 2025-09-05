@@ -23,7 +23,12 @@ jobs:
         shell: cmd
         run: |
           msbuild.exe TestCICDDocker.sln /p:platform="Any CPU" /p:configuration="Release" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true 
-      
+      - name : Prepare Docker Context
+        shell: cmd
+        run: |
+          mkdir TestPublish
+          xcopy /s /e /y ".\TestCICDDocker\obj\Release\Package\PackageTmp\*" ".\TestPublish"
+        
       - name: Log in to GHCR
         shell: cmd
         run: echo %GHCR_TOKEN% | docker login ghcr.io -u %GITHUB_ACTOR% --password-stdin
@@ -32,11 +37,11 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
       
       - name: Build Docker Image
-        shell: powershell
+        shell: cmd
         run: docker build -t testcicddocker:latest .
       
       - name: Tag & Push to GHCR
-        shell: powershell
+        shell: cmd
         run: |
           docker tag servicefactory:latest ghcr.io/phucnh294/testcicddocker:latest
           docker push ghcr.io/phucnh294/TestCICDDocker:latest
