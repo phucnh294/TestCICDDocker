@@ -24,9 +24,11 @@ jobs:
         run: |
           msbuild.exe TestCICDDocker.sln /p:platform="Any CPU" /p:configuration="Release" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true 
       
-      - name: Log in to GHCR
-        shell: pwsh
-        run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u {{ github.actor }} --password-stdin
+      -  name: Log in to GHCR
+         shell: powershell
+         run: echo $env:GHCR_TOKEN | docker login ghcr.io -u $env:GITHUB_ACTOR --password-stdin
+         env:
+            GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       
       - name: Build Docker Image
         shell: pwsh
