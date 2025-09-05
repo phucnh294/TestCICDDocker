@@ -39,7 +39,7 @@ jobs:
       
       - name: Build Docker Image
         shell: cmd
-        run: docker build -t testcicddocker:latest -f .\TestCICDDocker\TestCICDDocker\TestCICDDocker\Dockerfile .\TestCICDDocker\TestCICDDocker\TestCICDDocker
+        run: docker build -t testcicddocker:latest -f .\TestCICDDocker\TestCICDDocker\TestCICDDocker\Dockerfile .\TestCICDDocker\TestPublish
       
       - name: Tag & Push to GHCR
         shell: cmd
