@@ -6,20 +6,21 @@ on:
 jobs:
   build-and-deploy:
     runs-on: self-hosted  
-    # GitServer
-    steps:
+   steps:      
       - uses: actions/checkout@v2
       
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
-      
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.5
+
+      - name: Restore Packages
+        run: nuget restore ISR.sln
+
       - name: Build Solution
-        shell: cmd
-        run: msbuild.exe TestCICDDocker.sln /p:Configuration=Release
-      
-      - name: Copy Build Artifacts test
-        shell: cmd
-        run: xcopy /s /e /y ".\TestCICDDocker\obj\Release\Package\PackageTmp" ".\TestCICDDocker\"
+        run: |
+          msbuild.exe TestCICDDocker.sln /p:platform="Any CPU" /p:configuration="Release" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true 
       
       - name: Log in to GHCR
         run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
