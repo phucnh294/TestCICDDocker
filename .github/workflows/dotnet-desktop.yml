@@ -6,7 +6,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: self-hosted  
-   steps:      
+    steps:      
       - uses: actions/checkout@v2
       
       - name: Setup MSBuild
