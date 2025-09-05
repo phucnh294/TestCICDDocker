@@ -20,6 +20,7 @@ jobs:
         run: nuget restore TestCICDDocker.sln
 
       - name: Build Solution
+        shell: cmd
         run: |
           msbuild.exe TestCICDDocker.sln /p:platform="Any CPU" /p:configuration="Release" /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true 
       
