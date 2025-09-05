@@ -1,0 +1,33 @@
+name: SF - Build and Deploy Docker 
+on:
+  push: 
+    branches: [ "main" ]
+  workflow_dispatch:
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted  
+    # GitServer
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+      
+      - name: Build Solution
+        run: msbuild.exe TestCICDDocker.sln /p:Configuration=Release
+      
+      - name: Copy Build Artifacts
+        run: xcopy /s /e /y ".\TestCICDDocker\obj\Release\Package\PackageTmp" ".\TestCICDDocker\"
+      
+      - name: Log in to GHCR
+        run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
+      
+      - name: Build Docker Image
+        run: docker build -t testcicddocker:latest .
+      
+      - name: Tag & Push to GHCR
+        run: |
+          docker tag servicefactory:latest ghcr.io/phucnh294/testcicddocker:latest
+          docker push ghcr.io/phucnh294/TestCICDDocker:latest
+      
+      
