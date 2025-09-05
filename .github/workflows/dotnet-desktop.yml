@@ -32,11 +32,11 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
       
       - name: Build Docker Image
-        shell: pwsh
+        shell: powershell
         run: docker build -t testcicddocker:latest .
       
       - name: Tag & Push to GHCR
-        shell: pwsh
+        shell: powershell
         run: |
           docker tag servicefactory:latest ghcr.io/phucnh294/testcicddocker:latest
           docker push ghcr.io/phucnh294/TestCICDDocker:latest
